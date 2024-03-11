@@ -8,6 +8,10 @@ function controllerRouting(app) {
   router.get('/status', (req, res) => {
     AppController.getStatus(req, res);
   });
+
+  router.get('/stats', (req, res) => {
+    AppController.getStats(req, res);
+  });
 }
 
 export default controllerRouting;

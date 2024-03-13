@@ -1,8 +1,10 @@
 import sha1 from "sha1";
-import DBClient from "../utils/db";
-import RedisClient from "../utils/redis";
+import DBClient from "../utils/db.js";
+import RedisClient from "../utils/redis.js";
 
-import { ObjectId } from "mongodb";
+import pkg from "mongodb";
+const { ObjectId } = pkg;
+
 import Bull from "bull";
 
 class UsersController {
@@ -55,4 +57,4 @@ class UsersController {
   }
 }
 
-module.exports = UsersController;
+export default UsersController;

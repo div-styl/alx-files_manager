@@ -1,4 +1,5 @@
-import { MongoClient } from "mongodb";
+import pkg from "mongodb";
+const { MongoClient } = pkg;
 
 // db variables
 const DB_HOST = process.env.DB_HOST || "localhost";

@@ -1,23 +1,23 @@
-import { v4 as uuidv4 } from 'uuid';
-import sha1 from 'sha1';
-import redisClient from '../utils/redis';
-import userUtils from '../utils/user';
+import { v4 as uuidv4 } from "uuid";
+import sha1 from "sha1";
+import redisClient from "../utils/redis.js";
+import userUtils from "../utils/user.js";
 
 class AuthController {
   static async getConnect(req, res) {
-    const auth = req.header('Authorization') || '';
-    const credentials = auth.split(' ')[1];
+    const auth = req.header("Authorization") || "";
+    const credentials = auth.split(" ")[1];
     if (!credentials) {
-      return res.status(401).send({ error: 'Unauthorized' });
+      return res.status(401).send({ error: "Unauthorized" });
     }
 
-    const decodedCredentials = Buffer.from(credentials, 'base64').toString(
-      'utf-8',
+    const decodedCredentials = Buffer.from(credentials, "base64").toString(
+      "utf-8"
     );
-    const [email, password] = decodedCredentials.split(':');
+    const [email, password] = decodedCredentials.split(":");
 
     if (!email || !password) {
-      return res.status(401).send({ error: 'Unauthorized' });
+      return res.status(401).send({ error: "Unauthorized" });
     }
     const sh1pwd = sha1(password);
 
@@ -26,7 +26,7 @@ class AuthController {
       password: sh1pwd,
     });
     if (!user) {
-      return res.status(401).send({ error: 'Unauthorized' });
+      return res.status(401).send({ error: "Unauthorized" });
     }
 
     const token = uuidv4();
@@ -42,7 +42,7 @@ class AuthController {
   static async getDisconnect(req, res) {
     const { userId, key } = await userUtils.getUserIdAndKey(req);
 
-    if (!userId) return res.status(401).send({ error: 'Unauthorized' });
+    if (!userId) return res.status(401).send({ error: "Unauthorized" });
 
     await redisClient.del(key);
 

@@ -1,38 +1,58 @@
-import pkg from "mongodb";
-const { MongoClient } = pkg;
-
-// db variables
-const DB_HOST = process.env.DB_HOST || "localhost";
-const DB_PORT = process.env.DB_PORT || 27017;
-const DB_DATABASE = process.env.DB_DATABASE || "files_manager";
-const URL = `mongodb://${DB_HOST}:${DB_PORT}`;
+import { MongoClient } from "mongodb";
 
 class DBClient {
   constructor() {
-    MongoClient.connect(URL, { useUnifiedTopology: true }, (err, client) => {
-      if (!err) {
-        this.db = client.db(DB_DATABASE);
-        this.usersCollection = this.db.collection("users");
-        this.filesCollection = this.db.collection("files");
-      } else {
-        console.log(err.message);
-        this.db = false;
-      }
+    const host = process.env.DB_HOST ? process.env.DB_HOST : "localhost";
+    const port = process.env.DB_PORT ? process.env.DB_PORT : "27017";
+    const database = process.env.DB_DATABASE
+      ? process.env.DB_DATABASE
+      : "files_manager";
+
+    const url = `mongodb://${host}:${port}/${database}`;
+    this.connected = false;
+    this.client = new MongoClient(url, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
     });
+    (async () => {
+      try {
+        await this.client.connect();
+        this.db = this.client.db(database);
+        this.connected = true;
+      } catch (err) {
+        console.log(err);
+        this.connected = false;
+      }
+    })();
   }
 
   isAlive() {
-    return Boolean(this.db);
+    return this.connected;
   }
 
   async nbUsers() {
-    return this.usersCollection.countDocuments();
+    let documentUser = null;
+    try {
+      const userCollection = this.db.collection("users");
+      documentUser = await userCollection.countDocuments();
+    } catch (err) {
+      console.log(err);
+    }
+    return documentUser;
   }
 
   async nbFiles() {
-    return this.filesCollection.countDocuments();
+    let fileDocument = null;
+    try {
+      const fileCollection = this.db.collection("files");
+      fileDocument = await fileCollection.countDocuments();
+    } catch (err) {
+      console.log(err);
+    }
+    return fileDocument;
   }
 }
 
 const dbClient = new DBClient();
+
 export default dbClient;
